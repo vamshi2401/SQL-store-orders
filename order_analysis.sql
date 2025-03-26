@@ -1,11 +1,11 @@
-SELECT * FROM superstoreorders;
+SELECT * FROM orders;
 
 -- Total Sales, Profit, and Quantity
 SELECT
     SUM(sales) AS total_sales,
     SUM(profit) AS total_profit,
     SUM(quantity) AS total_quantity
-FROM superstoreorders;
+FROM orders;
 
 -- Average, Minimum, and Maximum Values for Sales, Profit, and Quantity
 SELECT
@@ -18,7 +18,7 @@ SELECT
     AVG(quantity) AS average_quantity,
     MIN(quantity) AS min_quantity,
     MAX(quantity) AS max_quantity
-FROM superstoreorders;
+FROM orders;
 
 -- Temporal Analysis - Sales, Profit, and Quantity Trends by Quarter
 SELECT
@@ -27,33 +27,18 @@ SELECT
     SUM(sales) AS total_sales,
     SUM(profit) AS total_profit,
     SUM(quantity) AS total_quantity
-FROM superstoreorders
+FROM orders
 GROUP BY order_year, order_quarter
 ORDER BY order_year, order_quarter;
 
--- Identify Top Sales Quarter for Each Year
-WITH RankedQuarters AS (
-    SELECT
-        YEAR(order_date) AS order_year,
-        QUARTER(order_date) AS order_quarter,
-        SUM(sales) AS total_sales,
-        RANK() OVER (PARTITION BY YEAR(order_date) ORDER BY SUM(sales) DESC) AS sales_rank
-    FROM superstoreorders
-    GROUP BY order_year, order_quarter
-)
-SELECT
-    order_year,
-    order_quarter,
-    total_sales AS peak_sales
-FROM RankedQuarters
-WHERE sales_rank = 1;
+
 
 -- Top-Selling Categories and Sub-Categories
 SELECT
     category,
     sub_category,
     SUM(sales) AS total_sales
-FROM superstoreorders
+FROM orders
 GROUP BY category, sub_category
 ORDER BY total_sales DESC;
 
@@ -62,7 +47,7 @@ SELECT
     category,
     sub_category,
     SUM(profit) AS total_profit
-FROM superstoreorders
+FROM orders
 GROUP BY category, sub_category
 ORDER BY total_profit DESC;
 
@@ -71,7 +56,7 @@ SELECT
     region,
     SUM(sales) AS total_sales,
     SUM(profit) AS total_profit
-FROM superstoreorders
+FROM orders
 GROUP BY region
 ORDER BY total_profit DESC;
 
@@ -80,7 +65,7 @@ SELECT
     segment,
     SUM(sales) AS total_sales,
     SUM(profit) AS total_profit
-FROM superstoreorders
+FROM orders
 GROUP BY segment
 ORDER BY total_profit DESC;
 
@@ -89,7 +74,7 @@ SELECT
     product_name,
     SUM(sales) AS total_sales,
     SUM(profit) AS total_profit
-FROM superstoreorders
+FROM orders
 GROUP BY product_name
 ORDER BY total_profit DESC, total_sales DESC;
 
@@ -98,7 +83,7 @@ SELECT
     discount,
     AVG(sales) AS average_sales,
     AVG(profit) AS average_profit
-FROM superstoreorders
+FROM orders
 GROUP BY discount
 ORDER BY discount DESC;
 
@@ -108,7 +93,7 @@ SELECT
     ship_mode,
     AVG(shipping_cost) AS avg_shipping_cost,
     AVG(profit) AS average_profit
-FROM superstoreorders
+FROM orders
 GROUP BY ship_mode
 ORDER BY avg_shipping_cost DESC;
 
@@ -118,7 +103,7 @@ SELECT
     AVG(sales) AS avg_sales,
     AVG(profit) AS avg_profit,
     COUNT(distinct order_id) AS order_count
-FROM superstoreorders
+FROM orders
 GROUP BY order_priority
 ORDER BY order_priority;
 
@@ -126,7 +111,7 @@ ORDER BY order_priority;
 SELECT
     customer_name,
     SUM(sales) AS total_sales
-FROM superstoreorders
+FROM orders
 GROUP BY customer_name
 ORDER BY total_sales DESC
 LIMIT 10; 
@@ -135,7 +120,7 @@ LIMIT 10;
 SELECT
     customer_name,
     SUM(profit) AS total_profit
-FROM superstoreorders
+FROM orders
 GROUP BY customer_name
 ORDER BY total_profit DESC
 LIMIT 10; -- Adjust the limit as needed
@@ -145,29 +130,10 @@ SELECT
     customer_name,
     COUNT(DISTINCT order_id) AS total_orders,
     AVG(sales) AS average_sales_per_order
-FROM superstoreorders
+FROM orders
 GROUP BY customer_name
 ORDER BY total_orders DESC
 LIMIT 10;
 
 
--- Calculating RFM
-SELECT
-    customer_name,
-    DATEDIFF('2015-01-30', MAX(order_date)) AS recency,
-    COUNT(DISTINCT order_id) AS frequency,
-    SUM(sales) AS monetary_value
-FROM
-    superstoreorders
-GROUP BY
-    customer_name;
-    
-SELECT
-    customer_name,
-    NTILE(4) OVER (ORDER BY DATEDIFF('2015-01-30', MAX(order_date))) AS rfm_recency,
-    NTILE(4) OVER (ORDER BY COUNT(DISTINCT order_id)) AS rfm_frequency,
-    NTILE(4) OVER (ORDER BY SUM(sales)) AS rfm_monetary
-FROM
-    superstoreorders
-GROUP BY
-    customer_name;
+
