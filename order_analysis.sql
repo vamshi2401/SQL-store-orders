@@ -123,7 +123,7 @@ SELECT
 FROM orders
 GROUP BY customer_name
 ORDER BY total_profit DESC
-LIMIT 10; -- Adjust the limit as needed
+LIMIT 10; 
 
 -- Analyze Customer Buying Patterns
 SELECT
